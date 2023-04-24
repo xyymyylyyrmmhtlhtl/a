@@ -1,0 +1,90 @@
+class Commodity:
+    def __init__(self, name, price, quantity):
+        self.name = name
+        self.price = price
+        self.quantity = quantity
+
+    def display(self):
+        print("{0}\t{1}\t{2}".format(self.name, self.price, self.quantity))
+     
+
+class CommodityManagementSystem:
+    def __init__(self):
+        self.commodities = []
+
+    def add_commodity(self):
+        print("请输入商品的名称、价格和数量，以空格分隔：")
+        name, price, quantity = input().split()
+        price = float(price)
+        quantity = int(quantity)
+        commodity = Commodity(name, price, quantity)
+        self.commodities.append(commodity)
+        print("商品添加成功！")
+
+    def delete_commodity(self):
+        print("请输入要删除的商品名称：")
+        name = input()
+        index = -1
+        for i in range(len(self.commodities)):
+            if self.commodities[i].name == name:
+                index = i
+                break
+        if index == -1:
+            print("没有找到该商品！")
+        else:
+            self.commodities.pop(index)
+            print("商品删除成功！")
+
+    def display_commodity(self):
+        print("名称\t\t价格\t\t数量")
+        for commodity in self.commodities:
+            commodity.display()
+
+    def modify_commodity(self):
+        print("请输入要修改的商品名称：")
+        name = input()
+        index = -1
+        for i in range(len(self.commodities)):
+            if self.commodities[i].name == name:
+                index = i
+                break
+        if index == -1:
+            print("没有找到该商品！")
+        else:
+            print("请输入新的商品信息，以空格分隔：")
+            name, price, quantity = input().split()
+            price = float(price)
+            quantity = int(quantity)
+            self.commodities[index].name = name
+            self.commodities[index].price = price
+            self.commodities[index].quantity = quantity
+            print("商品修改成功！")
+
+    def exit_system(self):
+        print("谢谢使用！")
+        exit()
+
+    def display_menu(self):
+        print("欢迎使用商品管理系统！")
+        print("1. 添加商品")
+        print("2. 删除商品")
+        print("3. 查看商品")
+        print("4. 修改商品")
+        print("5. 退出系统")
+system = CommodityManagementSystem()
+system.display_menu()
+while True:
+    command = input("请输入要执行的操作：")
+    if command == "1":
+        system.add_commodity()
+    elif command == "2":
+        system.delete_commodity()
+    elif command == "3":
+        system.display_commodity()
+    elif command == "4":
+        system.modify_commodity()
+    elif command == "5":
+        system.exit_system()
+    else:
+        print("输入有误，请重新输入！")
+    input("按任意键继续...") # 暂停程序，等待用户输入
