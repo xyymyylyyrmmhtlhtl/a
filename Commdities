@@ -1,0 +1,176 @@
+import os
+import pymysql
+
+#建表
+def CreateTable():
+    conn = pymysql.connect(host="localhost", user="root", password="123", database="commodity")
+    cur = conn.cursor()
+    try:
+        cur.execute('DROP TABLE IF EXISTS commodities')
+        sqlQuery = '''CREATE TABLE commodities(
+                                   id  int  primary key,
+                                   name CHAR(20) NOT NULL ,
+                                   price int(5),
+                                   tips CHAR(20) )'''
+        cur.execute(sqlQuery)
+        print("数据表创建完成！")
+    except pymysql.Error as error:
+        print("数据表创建失败：" + str(error))
+        conn.rollback()
+    finally:
+        conn.close()
+
+CreateTable()
+
+
+
+class manager():
+
+    def show_choice(self):
+        print("-------------欢迎使用商品管理系统--------------")
+        print("------1.添加商品----------")
+        print("------2.修改商品----------")
+        print("------3.删除商品----------")
+        print("------4.查看单个商品-------")
+        print("------5.查看所有商品-------")
+        print("------6.退出系统----------")
+
+    def insert():
+        conn= conn = pymysql.connect(host="localhost", user="root", password="123", database="commodity")
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+
+        while True:
+            name = input("请输入商品名称：")
+            if not name:
+                print("请输入有效商品")
+                continue
+            try:
+                price = input("请输入价格： ")
+                tips = input("请输入备注： ")
+                sql = "insert into commodities (name , price , tips)values(%s,%d,%s)"
+                count = cursor.execute(sql)
+                if count>0:
+                    conn.commit()
+                    print('商品添加成功')
+                    answer = input('是否继续添加？ y/n \n')
+                    if answer!='y':
+                        break
+                    else:
+                        continue
+            except pymysql.err.IntegrityError:
+                print('主键不允许重复') 
+
+
+    def update():
+        conn= conn = pymysql.connect(host="localhost", user="root", password="123", database="commodity")
+
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        while True:
+            commodities_id = input("请输入商品名称：")
+            if commodities_id !='':
+                name = input('请输入商品名称： ')
+                price = input('请输入商品名称： ')
+                tips = input('请输入商品名称： ')
+                sql = f"update commodities set name ='{name}' ,price='{price}',tips ='{tips}' "
+                d=cursor.execute(sql)
+                if d:
+                    print('修改成功')
+                else:
+                    print('修改失败')
+                answer = input('是否继续添加？ y/n \n')
+                if answer!='y':
+                        break
+                else:
+                        continue  
+            else:
+                print('输入有误！请重新输入')
+                continue    
+
+
+    def delete():
+        conn= conn = pymysql.connect(host="localhost", user="root", password="123", database="commodity")
+
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        while True:
+
+            commodities_id = input("请输入商品id: ")
+            if not commodities_id!='':
+                sql = f"select * from commodities where id ={commodities_id}"
+                cursor.execute(sql)
+                answer = input('是否继续删除？ y/n \n')
+                if answer!='y':
+                    break
+                else:
+                    continue    
+            
+
+    def show_single():
+        conn= conn = pymysql.connect(host="localhost", user="root", password="123", database="commodity")
+
+        cursor=conn.cursor(pymysql.cursors.SSCursor)
+        while True:
+           mode = input('按ID查找请输入1 按姓名查找输入2:')
+           if mode == '1':
+            id = input('请输入商品id')
+            sql = f"select * from commodities where id={id}"
+            cursor.execute(sql)
+            print(cursor.fetchall())
+            answer = input('是否继续查询? y/n \n')
+            if answer != 'y':
+                break
+            else:
+                continue
+           elif mode == '2':
+            name = input('请输入商品名称：')
+            sql = f"select * from commodities where name='{name}'"
+
+            cursor.execute(sql)
+            print(cursor.fetchall())
+            answer = input('是否继续查询? y/n\n')
+            if answer != 'y':
+                break
+            else:
+                continue
+           else:
+            print('您的输入有误，请重新输入')
+            continue 
+
+        
+
+    def show_all(self):
+        conn= conn = pymysql.connect(host="localhost", user="root", password="123", database="commodity")
+        cursor=conn.cursor(pymysql.cursors.SSCursor)
+        while True:
+            sql = f"select *from commodities"
+            cursor.execute(sql)
+            print(cursor.fetchall())
+
+
+if __name__ == '__main__':
+    while True:
+        man = manager()
+        man.show_choice()
+        ch = input("请选择想要进行的操作：")
+
+        if ch=="1":
+            commodityInfo=man.insert()
+        elif ch=="2":
+            commodityInfo=man.update()
+        elif ch == "3":
+            commodityInfo = man.delete()
+        elif ch=="4":
+            man.show_single()
+        elif ch=="5":
+            man.show_all()
+        elif ch=="6":
+            break
+        else:
+             print("没有此操作序号，请重新输入！")
+
+        
+
+
+
