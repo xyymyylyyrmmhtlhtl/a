@@ -1,0 +1,172 @@
+import pymysql
+
+class mysql:
+    def __init__(self,host,uesr,password,db):
+        self.host = host
+        self.user = uesr
+        self.password = password
+        self.db = db
+        self.conn = None
+
+    def connexct(self):
+        self.conn = pymysql.connect(host=self.host,
+                                    user= self.user,
+                                    password=self.password,
+                                    db=self.db)
+        
+    def add(self,id,name,sum,price):
+            cursor = self.conn.cursor()
+            sql1 = "insert into product values(%s,%s,%s,%s)"
+            cursor.execute(sql1,(id,name,sum,price))
+            self.conn.commit()
+
+    def update(self,id,name,sum,price):
+         cursor = self.conn.cursor()
+         sql2 = "update product set id=%s, name=%s,sum=%s,price=%s"
+         cursor.execute(sql2,(id,name,sum,price))
+         self.conn.commit()
+
+    def delete(self ,id):
+              cursor = self.conn.cursor()
+              sql3 = "delete from product where id=%s"
+              cursor.execute(sql3,(id))
+              self.conn.commit()
+    def show_single(self,id):
+         cursor = self.conn.cursor()
+         sql4 = "select from product where id=%s"
+         cursor.execute(sql4,(id))
+         result = cursor.fetchone()       
+         return result
+    
+    def show_all(self):
+          cursor = self.conn.cursor()
+          sql5 = "select from product"
+          cursor.execute(sql5)
+          result = cursor.fetchone()
+          return result
+    
+    def checkC(self,id):
+        cursor = self.conn.cursor()
+        #返回指定条件下满足查询条件的数据行数（即统计数量），而不是返回所有匹配的行
+        query = "select count(*) from product where id = %s"
+        cursor.execute(query,(id))
+        result = cursor.fetchone()
+        return result
+
+    def checkSingle(self,id):
+        cursor = self.conn.cursor()
+        #返回所有匹配查询条件的行及其所有列的值
+        query = "select * from product where id = %s"
+        cursor.execute(query, (id))
+        result = cursor.fetchone()
+        return result
+
+    def checkT(self):
+        cursor = self.conn.cursor()
+        query = "select * from product"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return result
+    
+    def quit(self):
+          if self.conn is not None:
+                self.conn.close()
+
+class product:
+      def __init__(self,id,name,sum,price):
+                            self.id = id
+                            self.name =name
+                            self.sum = sum
+                            self.price = price
+
+class manager:
+       def __init__(self,mysql):
+              self.mysql = mysql
+
+       def add_product(self):
+              id = input("请输入商品编号:")
+              name = input("请输入商品名称:")
+              sum = input("请输入商品数量:")
+              price = input("请输入商品价格:")
+              result = self.mysql.checkC(id)
+              if result[0] == 0:
+                     self.mysql.add(id,name,sum,price)
+                     print("添加成功！")
+              else:
+                     print("商品已存在")
+
+       def update_product(self):
+              id = input("请输入商品编号:")
+              name = input("请输入商品名称:")
+              sum = input("请输入商品数量:")
+              price = input("请输入商品价格:")
+              result = self.mysql.checkC(id)
+              if result[0] > 0:
+                     self.mysql.upadte(id,name,sum,price)
+                     print("修改成功！")
+              else:
+                     print("商品不存在！")             
+
+       def delete_product(self):
+              id = input("请输入商品编号:")
+              
+              result = self.mysql.checkC(id)
+              if result[0] > 0:
+                     self.mysql.delete(id)
+                     print("删除成功！")
+              else:
+                     print("商品不存在")
+
+       def show_single(self):
+               id = input("请输入要查找的商品编号:")
+               result = self.mysql.checkSingle(id)
+
+               if result is None:
+                      print("查找的商品不存在！")
+               else:
+                      print(f"商品编号:{result[0]} 商品名称:{result[1]} 商品数量:{result[2]} 商品价格:{result[3]} 商品信息:{result[4]}")
+
+
+       def show_all(self):
+               result = self.mysql.checkT()
+       
+               if len(result) == 0:
+                  print("商品信息为空！")
+               else:
+                  print("-----------------商品信息-------------------")
+                  for i in result:
+                      print(f"商品编号:{i[0]} 商品名称:{i[1]} 商品数量:{i[2]} 商品价格:{i[3]} 商品信息:{i[4]}")
+
+#创建mysql对象
+mysql = mysql(host='localhost',user='root',password='123456',db='iot23')
+#连接数据库
+mysql.connect()
+
+manager =  manager(mysql)
+
+while True:
+    print("-------------欢迎使用商品管理系统--------------")
+    print("------1.添加商品----------")
+    print("------2.修改商品----------")
+    print("------3.删除商品----------")
+    print("------4.查看单个商品-------")
+    print("------5.查看所有商品-------")
+    print("------6.退出系统----------")
+    choice = input("请输入要进行的操作:")
+
+    if choice == '1':
+        manager.add_com()
+    elif choice == '2':
+        manager.update_com()
+    elif choice == '3':
+        manager.delete_com()
+    elif choice == '4':
+        manager.show_single()
+    elif choice == '5':
+        manager.show_all()
+    elif choice == '6':
+        break
+    else:
+        print("没有此操作数！")
+
+mysql.quit()
